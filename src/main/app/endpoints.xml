@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
+	xmlns:sfdc="http://www.mulesoft.org/schema/mule/sfdc" 
+	xmlns="http://www.mulesoft.org/schema/mule/core" 
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	version="EE-3.6.1"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/sfdc http://www.mulesoft.org/schema/mule/sfdc/current/mule-sfdc.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+   
+   <flow name="triggerFlow" 
+		processingStrategy="synchronous" initialState="started">
+		<poll doc:name="Poll">
+			<fixed-frequency-scheduler frequency="${polling.frequency}"
+				startDelay="${polling.startDelay}" />
+			<watermark variable="lastQueryDate" default-expression="${watermark.default.expression}"
+				selector="MAX" selector-expression="#[payload.LastModifiedDate]" />
+
+                <sfdc:query config-ref="Salesforce" query="dsql:SELECT AccountNumber, Fax, Id, LastModifiedDate, Name, Phone, Website FROM Account WHERE LastModifiedDate &gt; #[flowVars['lastQueryDate']] ORDER BY LastModifiedDate ASC LIMIT 200" doc:name="Fetch accounts from Salesforce"/>
+           
+		</poll>
+		<batch:execute name="syncAccountsToCustomersBatch" doc:name="Trigger batch execution" />
+		        <exception-strategy ref="defaultChoiceExceptionStrategy" doc:name="Catch Exception and call defaultChoiceExceptionStrategy"/>
+	</flow>
+
+
+</mule>

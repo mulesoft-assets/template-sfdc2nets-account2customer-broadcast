@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?><Graph __version="3.5.0" author="Admin" created="Mon Apr 27 08:23:29 CEST 2015" description="Account to Customer" guiVersion="3.4.4.P" id="1430124446035" licenseCode="Unlicensed" licenseType="Unknown" modified="Mon Apr 27 08:23:29 CEST 2015" modifiedBy="Admin" name="Account_to_Customer" revision="1.0" showComponentDetails="false">
+<Global>
+<Metadata __index="0" __referenceCounter="1" __sourcePath="{}/Account" _dataStructure="OBJECT" _id="__id" _type="Input" id="c3d5a89c-b261-4e1f-8b47-4cdb87b0e541">
+<Record fieldDelimiter="," name="Account" recordDelimiter="\n\\|\r\n\\|\r" type="delimited">
+<Field __artificialType="_id" __systemManaged="true" name="__id" type="string"/>
+<Field __index="1" __sourcePath="{}/Account/Fax" containerType="SINGLE" label="Fax" name="Fax" type="string"/>
+<Field __index="4" __sourcePath="{}/Account/Id" containerType="SINGLE" label="Id" name="Id" type="string"/>
+<Field __index="3" __sourcePath="{}/Account/Name" containerType="SINGLE" label="Name" name="Name" type="string"/>
+<Field __index="0" __sourcePath="{}/Account/Phone" containerType="SINGLE" label="Phone" name="Phone" type="string"/>
+<Field __index="2" __sourcePath="{}/Account/Website" containerType="SINGLE" label="Website" name="Website" type="string"/>
+</Record>
+</Metadata>
+<Metadata __index="0" __referenceCounter="1" __sourcePath="{}/Customer" _dataStructure="OBJECT" _id="__id" _type="Output" id="6825589b-f1b5-4e2b-908f-b93d2727c3b0">
+<Record fieldDelimiter="," name="Customer" recordDelimiter="\n\\|\r\n\\|\r" type="delimited">
+<Field __artificialType="_id" __systemManaged="true" name="__id" type="string"/>
+<Field __index="3" __sourcePath="{}/Customer/companyName" containerType="SINGLE" label="companyName" name="companyName" type="string"/>
+<Field __index="4" __sourcePath="{}/Customer/externalId" containerType="SINGLE" label="externalId" name="externalId" type="string"/>
+<Field __index="1" __sourcePath="{}/Customer/fax" containerType="SINGLE" label="fax" name="fax" type="string"/>
+<Field __index="0" __sourcePath="{}/Customer/phone" containerType="SINGLE" label="phone" name="phone" type="string"/>
+<Field __index="2" __sourcePath="{}/Customer/url" containerType="SINGLE" label="url" name="url" type="string"/>
+</Record>
+</Metadata>
+<Dictionary>
+<Entry id="DictionaryEntry0" input="true" name="inputPayload" output="false" type="object"/>
+<Entry id="DictionaryEntry1" input="false" name="outputPayload" output="true" type="object"/>
+<Entry dictval.__javaType="com.netsuite.webservices.lists.relationships.Customer" id="DictionaryEntry2" input="true" name="accountInTargetInstance" output="false" type="object"/>
+</Dictionary>
+</Global>
+<Phase number="0">
+<Node enabled="enabled" fileURL="dict:inputPayload" guiName="Map&lt;k,v&gt; READER" guiX="20" guiY="20" id="BEAN_READER0" type="BEAN_READER">
+<attr name="mapping"><![CDATA[<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Context outPort="0" sequenceField="__id" xpath=".">
+  <Mapping cloverField="Fax" trim="true" xpath="Fax"/>
+  <Mapping cloverField="Id" trim="true" xpath="Id"/>
+  <Mapping cloverField="Name" trim="true" xpath="Name"/>
+  <Mapping cloverField="Phone" trim="true" xpath="Phone"/>
+  <Mapping cloverField="Website" trim="true" xpath="Website"/>
+</Context>
+]]></attr>
+<attr name="_data_format"><![CDATA[MAP]]></attr>
+</Node>
+<Node enabled="enabled" guiName="Foreach 'Account' -&gt; 'Customer'" guiX="460" guiY="20" id="FOREACH_ACCOUNT_CUSTOMER" transformClass="com.mulesoft.datamapper.transform.MelRecordTransform" type="REFORMAT">
+<attr name="melScript"><![CDATA[//MEL
+//START -> DO NOT REMOVE
+output.__id = input.__id;
+//END -> DO NOT REMOVE
+output.fax = input.Fax;
+output.phone = input.Phone;
+output.companyName = input.Name;
+output.externalId = input.Id;
+output.url = input.Website;]]></attr>
+</Node>
+<Node cacheInMemory="true" enabled="enabled" fileURL="dict:outputPayload" guiName="Map&lt;k,v&gt; WRITER" guiX="900" guiY="20" id="MAP_WRITER0" type="MAP_WRITER">
+<attr name="mapping"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<Customer xmlns:clover="http://www.cloveretl.com/ns/xmlmapping" clover:inPort="0">
+  <phone>$0.phone</phone>
+  <fax>$0.fax</fax>
+  <url>$0.url</url>
+  <companyName>$0.companyName</companyName>
+  <externalId>$0.externalId</externalId>
+</Customer>]]></attr>
+<attr name="_data_format"><![CDATA[MAP]]></attr>
+</Node>
+<Edge debugMode="true" fromNode="BEAN_READER0:0" guiBendpoints="" id="Edge0" inPort="Port 0 (in)" metadata="c3d5a89c-b261-4e1f-8b47-4cdb87b0e541" outPort="Port 0 (out)" toNode="FOREACH_ACCOUNT_CUSTOMER:0"/>
+<Edge debugMode="true" fromNode="FOREACH_ACCOUNT_CUSTOMER:0" guiBendpoints="" id="Edge1" inPort="Port 0 (in)" metadata="6825589b-f1b5-4e2b-908f-b93d2727c3b0" outPort="Port 0 (out)" toNode="MAP_WRITER0:0"/>
+</Phase>
+</Graph>

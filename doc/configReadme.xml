@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+<configuration>
+	<placeholders>
+		<placeholder id="template_name">Salesforce to Netsuite Account to Customer Broadcast</placeholder>
+	</placeholders>
+	<sections>
+		<section id="use_case">
+
+This Anypoint Template should serve as a foundation for setting an online sync of Accounts from Salesforce instance to Customers in Netsuite instance. Everytime there is a new Account or a change in an already existing one, the integration will poll for changes in Salesforce source instance and it will be responsible for creating or updating the Customer in Netsuite target instance.
+
+Requirements have been set not only to be used as examples, but also to establish a starting point to adapt your integration to your requirements.
+
+As implemented, this Anypoint Template leverage the [Batch Module](http://www.mulesoft.org/documentation/display/current/Batch+Processing).
+The batch job is divided in Input, Process and On Complete stages.
+The integration is triggered by a poll defined in the flow that is going to trigger the application, querying newest Salesforce updates/creations matching a filter criteria and executing the batch job.
+During the Process stage, for each Account from Salesforce instance, we try to find already created Customer in Netsuite instance according to Account's name.
+Then the data are adapted for creating/updating the Customer in Netsuite and call the upsert operation in Netsuite system.
+Finally, during the On Complete stage the Anypoint Template will log output statistics data into the console.
+		</section>
+		<section id="considerations">
+<![CDATA[
+To make this Anypoint Template run, there are certain preconditions that must be considered. All of them deal with the preparations in both source and destination systems, that must be made in order for all to run smoothly. **Failling to do so could lead to unexpected behavior of the template.**
+]]>
+		</section>
+		<section id="run_it">
+<![CDATA[
+See below.
+]]>
+		</section>
+		<section id="default_running_on_premise">
+<![CDATA[
+In this section we detail the way you have to run you Anypoint Temple on you computer.
+
+Once your app is all set and started, there is no need to do anything else. The application will poll Accounts in Salesforce to know if there are any newly created or updated objects and synchronice them.
+]]>
+		</section>
+		<section id="default_running_on_cloudhub">
+<![CDATA[
+While [creating your application on CloudHub](http://www.mulesoft.org/documentation/display/current/Hello+World+on+CloudHub) (Or you can do it later as a next step), you need to go to Deployment > Advanced to set all environment variables detailed in **Properties to be configured** as well as the **mule.env**. 
+
+Once your app is all set and started, there is no need to do anything else. Every time an account is created or modified, it will be automatically synchronised to Salesforce Org B as long as it has an Email.
+]]>
+		</section>
+		<section id="application_configuration">
+		<![CDATA[
+**Application configuration**
+
++ polling.frequency `20000`
++ polling.startDelay `1000`
++ watermark.default.expression `YESTERDAY`
+
+**Salesforce Connector configuration**
+
++ sfdc.username `bob.dylan@orga`
++ sfdc.password `DylanPassword123`
++ sfdc.securityToken `avsfwCUl7apQs56Xq2AKi3X`
++ sfdc.url `https://login.salesforce.com/services/Soap/u/28.0`
+
+**Netsuite Connector configuration**
+
++ nets.email `example@organization.com`
++ nets.password `Passowrd123`
++ nets.account `NetsuiteAccount`
++ nets.roleId `3`
++ nets.customer.subsidiary.internalId `1`
+
+**Note**: the property `nets.customer.subsidiary.internalId` set **subsidiary** for every new Customer in Netsuite instance.
+]]>
+		</section>
+		<section id="api_calls">
+		<![CDATA[
+Salesforce imposes limits on the number of API Calls that can be made. Therefore calculating this amount may be an important factor to consider. The Anypoint Template calls to the API can be calculated using the formula:
+
+***1 + X + X / 200***
+
+Being ***X*** the number of Accounts to be synchronized on each run. 
+
+The division by ***200*** is because, by default, Accounts are gathered in groups of 200 for each Upsert API Call in the commit step. Also consider that this calls are executed repeatedly every polling cycle.	
+
+For instance if 10 records are fetched from origin instance, then 12 api calls will be made (1 + 10 + 1).
+]]>
+		</section>
+		<section id="default_business_logic_xml">
+		<![CDATA[
+Functional aspect of the Anypoint Template is implemented on this XML, directed by one flow that will poll for Salesforce creations/updates. The several message processors constitute four high level actions that fully implement the logic of this Anypoint Template:
+
+1. During the Input stage the Anypoint Template will go to the Salesforce instance and query all the existing Accounts that match the filter criteria.
+2. During the Process stage, for each Account from Salesforce instance, we try to find already created Customer in Netsuite instance according to Account's name.
+3. Then the data are adapted for creating/updating the Customer in Netsuite and call the upsert operation in Netsuite system.
+4. Finally during the On Complete stage the Anypoint Template will log output statistics data into the console.
+]]>
+		</section>
+		<section id="default_endpoints_xml">
+		<![CDATA[
+This is file contains the Poll endpoint that will periodically query Salesforce for updated/created Accounts that meet the defined criteria in the query, and then executing the batch job process, where the data serve as input.
+]]>
+		</section>
+	</sections>
+</configuration>
