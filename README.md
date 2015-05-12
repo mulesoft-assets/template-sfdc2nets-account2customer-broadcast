@@ -153,6 +153,7 @@ In order to use this Mule Anypoint Template you need to configure properties (Cr
 ### Application configuration
 **Application configuration**
 
++ page.size `200`
 + polling.frequency `20000`
 + polling.startDelay `1000`
 + watermark.default.expression `YESTERDAY`
