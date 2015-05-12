@@ -26,7 +26,7 @@ Note that using this template is subject to the conditions of this [License Agre
 Please review the terms of the license before downloading and using this template. In short, you are allowed to use the template for free with Mule ESB Enterprise Edition, CloudHub, or as a trial in Anypoint Studio.
 
 # Use Case <a name="usecase"/>
-This Anypoint Template should serve as a foundation for setting an online sync of Accounts from Salesforce instance to Customers in Netsuite instance. Everytime there is a new Account or a change in an already existing one, the integration will poll for changes in Salesforce source instance and it will be responsible for creating or updating the Customer in Netsuite target instance.
+This Anypoint Template should serve as a foundation for setting an online sync of Accounts from Salesforce instance to Customers in Netsuite instance. Every time there is a new Account or a change in an already existing one, the integration will poll for changes in Salesforce source instance and it will be responsible for creating or updating the Customer in Netsuite target instance.
 
 Requirements have been set not only to be used as examples, but also to establish a starting point to adapt your integration to your requirements.
 
@@ -91,7 +91,8 @@ column='486'
 
 ### As destination of data
 
-There are no particular considerations for this Anypoint Template regarding Netsuite as data destination.
+Customer must be assigned to subsidiary. In this template, this is done statically and you must configure the property file with subsidiary *internalId* that is already in the system. You can find out this number by entering 'subsidiaries' 
+into the NetSuite search field and selecting 'Page - Subsidiaries'. When you click on the 'View' next to the subsidiary chosen, you will see the ID in the URL line. Please, use this Id to populate *nets.subsidiaryId* property in the property file.
 
 
 
@@ -174,15 +175,7 @@ In order to use this Mule Anypoint Template you need to configure properties (Cr
 **Note**: the property `nets.customer.subsidiary.internalId` set **subsidiary** for every new Customer in Netsuite instance.
 
 # API Calls <a name="apicalls"/>
-Salesforce imposes limits on the number of API Calls that can be made. Therefore calculating this amount may be an important factor to consider. The Anypoint Template calls to the API can be calculated using the formula:
-
-***1 + X + X / 200***
-
-Being ***X*** the number of Accounts to be synchronized on each run. 
-
-The division by ***200*** is because, by default, Accounts are gathered in groups of 200 for each Upsert API Call in the commit step. Also consider that this calls are executed repeatedly every polling cycle.	
-
-For instance if 10 records are fetched from origin instance, then 12 api calls will be made (1 + 10 + 1).
+Salesforce imposes limits on the number of API Calls that can be made. However, in this template, only one call per poll cycle is done to retrieve all the information required.
 
 
 # Customize It!<a name="customizeit"/>
@@ -208,9 +201,8 @@ In the visual editor they can be found on the *Global Element* tab.
 Functional aspect of the Anypoint Template is implemented on this XML, directed by one flow that will poll for Salesforce creations/updates. The several message processors constitute four high level actions that fully implement the logic of this Anypoint Template:
 
 1. During the Input stage the Anypoint Template will go to the Salesforce instance and query all the existing Accounts that match the filter criteria.
-2. During the Process stage, for each Account from Salesforce instance, we try to find already created Customer in Netsuite instance according to Account's name.
-3. Then the data are adapted for creating/updating the Customer in Netsuite and call the upsert operation in Netsuite system.
-4. Finally during the On Complete stage the Anypoint Template will log output statistics data into the console.
+2. During the Process stage, for each Account from Salesforce instance the data are adapted for creating/updating the Customer in Netsuite and call the upsert operation in Netsuite system.
+3. Finally during the On Complete stage the Anypoint Template will log output statistics data into the console.
 
 
 

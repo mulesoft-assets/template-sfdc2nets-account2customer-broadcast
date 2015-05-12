@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:json="http://www.mulesoft.org/schema/mule/json" 
+<mule xmlns:spring="http://www.springframework.org/schema/beans" xmlns:json="http://www.mulesoft.org/schema/mule/json" 
 xmlns:data-mapper="http://www.mulesoft.org/schema/mule/ee/data-mapper" 
 xmlns:netsuite="http://www.mulesoft.org/schema/mule/netsuite" 
 xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
 xmlns="http://www.mulesoft.org/schema/mule/core" 
 xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-version="EE-3.6.1" 
+version="EE-3.6.2" 
 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
@@ -19,13 +19,7 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
      <batch:job name="syncAccountsToCustomersBatch" max-failed-records="1">
         <batch:threading-profile poolExhaustedAction="WAIT"/>
         <batch:process-records>
-            <batch:step name="forEachAccountInSalesforceGetCustomerFromNetsuiteStep">
-                <enricher doc:name="store Netsuite Customer in var 'accountInTargetInstance'" >
-                    <netsuite:query-records config-ref="Netsuite" query="dsql:SELECT fax, internalId, externalId, lastModifiedDate,companyName, phone, url FROM CUSTOMER WHERE (companyName = '#[payload['Name']]')" doc:name="Get Customer from Netsuite"/>
-                    <enrich source="payload.hasNext() ? payload.next() : NullPayload.getInstance()" target="recordVars['accountInTargetInstance']"/>
 
-                </enricher>
-            </batch:step>
 
             <batch:step name="forEachAccountInSalesforceToBeUpsertedCustomerInNetsuite" >
                 <data-mapper:transform config-ref="Account_to_Customer" doc:name="Account to Customer"/>
