@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:spring="http://www.springframework.org/schema/beans" xmlns:json="http://www.mulesoft.org/schema/mule/json" 
-xmlns:data-mapper="http://www.mulesoft.org/schema/mule/ee/data-mapper" 
+<mule xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:spring="http://www.springframework.org/schema/beans" xmlns:json="http://www.mulesoft.org/schema/mule/json" 
 xmlns:netsuite="http://www.mulesoft.org/schema/mule/netsuite" 
 xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
 xmlns="http://www.mulesoft.org/schema/mule/core" 
 xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-version="EE-3.6.2" 
+version="EE-3.7.1" 
 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
 http://www.mulesoft.org/schema/mule/netsuite http://www.mulesoft.org/schema/mule/netsuite/current/mule-netsuite.xsd
-http://www.mulesoft.org/schema/mule/ee/data-mapper http://www.mulesoft.org/schema/mule/ee/data-mapper/current/mule-data-mapper.xsd
-http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
-     <data-mapper:config name="Account_to_Customer" transformationGraphPath="account_to_customer.grf" doc:name="Account_to_Customer"/>
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd">
+
 
      <batch:job name="syncAccountsToCustomersBatch" max-failed-records="1">
         <batch:threading-profile poolExhaustedAction="WAIT"/>
@@ -22,15 +21,23 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
 
 
             <batch:step name="forEachAccountInSalesforceToBeUpsertedCustomerInNetsuite" >
-                <data-mapper:transform config-ref="Account_to_Customer" doc:name="Account to Customer"/>
-                <expression-component doc:name="Define Subsidiary for Customer"><![CDATA[import com.netsuite.webservices.platform.core.RecordRef;
-import com.netsuite.webservices.platform.core.types.RecordType;
+                <dw:transform-message doc:name="Transform Account to Customer">
+                    <dw:set-payload><![CDATA[%dw 1.0
+%output application/java
+---
+{
+	fax : payload.Fax,
+	phone : payload.Phone,
+	companyName : payload.Name,
+	externalId : payload.Id,
+	url : payload.Website,
+	subsidiary: {
+		type: "SUBSIDIARY",
+		internalId: p('nets.customer.subsidiary.internalId')
+	} as :object {class: "com.netsuite.webservices.platform.core.RecordRef"}
+}]]></dw:set-payload>
+                </dw:transform-message>
 
-RecordRef subsidiaryRef = new RecordRef();
-subsidiaryRef.setType(RecordType.SUBSIDIARY);
-subsidiaryRef.setInternalId('${nets.customer.subsidiary.internalId}');
-payload.put("subsidiary",subsidiaryRef);
-]]></expression-component>
                 <netsuite:upsert-record config-ref="Netsuite" recordType="CUSTOMER" doc:name="Upsert Customer in Netsuite">
                     <netsuite:attributes ref="#[payload]"/>
                 </netsuite:upsert-record>
