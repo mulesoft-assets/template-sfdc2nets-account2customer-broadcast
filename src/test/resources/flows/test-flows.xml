@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:netsuite="http://www.mulesoft.org/schema/mule/netsuite" 
+<mule xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns:spring="http://www.springframework.org/schema/beans" xmlns:netsuite="http://www.mulesoft.org/schema/mule/netsuite" 
 	xmlns:sfdc="http://www.mulesoft.org/schema/mule/sfdc"
 	xmlns="http://www.mulesoft.org/schema/mule/core"
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	version="EE-3.7.1"
+	
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/sfdc http://www.mulesoft.org/schema/mule/sfdc/current/mule-sfdc.xsd
-http://www.mulesoft.org/schema/mule/netsuite http://www.mulesoft.org/schema/mule/netsuite/current/mule-netsuite.xsd">
+http://www.mulesoft.org/schema/mule/netsuite http://www.mulesoft.org/schema/mule/netsuite/current/mule-netsuite.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd">
 
     <sub-flow name="createAccountInSalesforceFlow" >
         <sfdc:create config-ref="Salesforce" type="Account" doc:name="Salesforce">
@@ -31,9 +32,25 @@ http://www.mulesoft.org/schema/mule/netsuite http://www.mulesoft.org/schema/mule
         <logger level="INFO" message="Remove Accounts from B result: #[payload]" doc:name="Logger"/>
     </sub-flow>
     <sub-flow name="queryCustomerFromNetsuiteFlow">
-        <netsuite:get-record config-ref="Netsuite"  doc:name="Netsuite">
-            <netsuite:record-ref externalId="#[payload['Id']]" type="CUSTOMER"/>
-        </netsuite:get-record>
+        <dw:transform-message doc:name="Create search criteria" metadata:id="022c23dc-199d-4749-83fa-c308aca9ffa8">
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/java
+---
+{
+	basic: {
+		externalId: {
+			operator: "ANY_OF",
+			searchValue: [{
+				externalId: payload.Id
+			}]
+		}
+	}
+} as :object {class: "com.netsuite.webservices.lists.relationships.CustomerSearch"}]]></dw:set-payload>
+        </dw:transform-message>
+        <enricher source="#[payload.hasNext() ? payload.next() : null]" target="#[payload]" doc:name="retrieve result">
+            <netsuite:search config-ref="Netsuite" searchRecord="CUSTOMER" doc:name="Search for customer in Netsuite"/>
+        </enricher>
+
         <logger message="Retrieve Customers result: #[payload]" level="INFO" doc:name="Logger"/>
     </sub-flow>
     <sub-flow name="deleteCustomerFromNetsuiteFlow">
