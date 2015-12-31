@@ -156,7 +156,7 @@ In order to use this Mule Anypoint Template you need to configure properties (Cr
 + page.size `200`
 + polling.frequency `20000`
 + polling.startDelay `1000`
-+ watermark.default.expression `YESTERDAY`
++ watermark.default.expression `2015-12-31T10:00:00.000Z`
 
 **Salesforce Connector configuration**
 
@@ -171,6 +171,7 @@ In order to use this Mule Anypoint Template you need to configure properties (Cr
 + nets.password `Passowrd123`
 + nets.account `NetsuiteAccount`
 + nets.roleId `3`
++ nets.applicationId `77EBCBD6-AF9F-11E5-BF7F-FEFF819CDC9F`
 + nets.customer.subsidiary.internalId `1`
 
 **Note**: the property `nets.customer.subsidiary.internalId` set **subsidiary** for every new Customer in Netsuite instance.

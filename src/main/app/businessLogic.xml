@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:spring="http://www.springframework.org/schema/beans" xmlns:json="http://www.mulesoft.org/schema/mule/json" 
+<mule xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:spring="http://www.springframework.org/schema/beans" xmlns:json="http://www.mulesoft.org/schema/mule/json" 
 xmlns:netsuite="http://www.mulesoft.org/schema/mule/netsuite" 
 xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
 xmlns="http://www.mulesoft.org/schema/mule/core" 
 xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-version="EE-3.7.1" 
+ 
 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
@@ -21,7 +21,7 @@ http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee
 
 
             <batch:step name="forEachAccountInSalesforceToBeUpsertedCustomerInNetsuite" >
-                <dw:transform-message doc:name="Transform Account to Customer">
+                <dw:transform-message doc:name="Transform Account to Customer" metadata:id="06791dc9-80b4-4b1f-8e27-0743f3601397">
                     <dw:set-payload><![CDATA[%dw 1.0
 %output application/java
 ---
