@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:os="http://www.mulesoft.org/schema/mule/os"
+<mule xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+      xmlns:os="http://www.mulesoft.org/schema/mule/os"
       xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
       xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
-      xmlns="http://www.mulesoft.org/schema/mule/core"
-      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
 <flow name="schedulerFlow" doc:id="aff4106d-d2f6-4366-940a-a380dcb1cf73" >
     <scheduler doc:name="Scheduler" doc:id="58b7c776-fbee-4753-9bea-f6cc3e037efd" >
         <scheduling-strategy >
@@ -29,10 +30,18 @@ http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/cu
     <os:retrieve key="watermark" objectStore="watermarkStore" target="lastQueryTimestamp" doc:name="Retrieve lastQueryTimestamp">
         <os:default-value><![CDATA[${watermark.default.expression}]]></os:default-value>
     </os:retrieve>
-    <logger level="INFO" doc:name="Query Accounts from  Salesforce" doc:id="08f68fa6-4350-4e49-86c3-0736bb52ecc1"/>
-    <os:store key="watermark" failIfPresent="false" failOnNullValue="false" objectStore="watermarkStore" doc:name="Store lastQueryTimestamp">
-        <os:value>#[max(payload map $.LastModifiedDate)]</os:value>
+    <salesforce:query doc:name="Query" doc:id="c0d6a39e-cbc4-4053-84b5-e156f60091c4" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query >SELECT AccountNumber, Fax, Id, LastModifiedDate, Name, Phone, Website FROM Account WHERE LastModifiedDate &gt; :lastQueryTimestamp ORDER BY LastModifiedDate ASC LIMIT 200</salesforce:salesforce-query>
+                <salesforce:parameters ><![CDATA[#[output applicaton/java
+---
+{
+	"lastQueryTimestamp" : vars.lastQueryTimestamp
+}]]]></salesforce:parameters>            
+		</salesforce:query>
+		<os:store key="watermark" failIfPresent="false" failOnNullValue="false" objectStore="watermarkStore" doc:name="Store lastQueryTimestamp">
+        <os:value ><![CDATA[#[if(sizeOf(payload)==0) vars.lastQueryTimestamp as String else (max(payload map $.LastModifiedDate) as String)]]]></os:value>
     </os:store>
+		<logger level="INFO" doc:name="Logger" doc:id="8526a5ff-342b-4963-b139-2a50f22b95ce" message="new watermark value=#[if(sizeOf(payload)==0) vars.lastQueryTimestamp as String else (max(payload map $.LastModifiedDate) as String)]"/>
 
 </flow>
 </mule>
