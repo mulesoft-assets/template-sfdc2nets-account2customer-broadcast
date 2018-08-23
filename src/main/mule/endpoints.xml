@@ -18,7 +18,6 @@ http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mu
         </scheduling-strategy>
     </scheduler>
     <flow-ref doc:name="queryFlow" doc:id="ada07859-8839-4751-9623-68a08d31a472" name="queryFlow" />
-    <logger level="INFO" doc:name="Log Accounts to sync" doc:id="65934ef1-2939-4fab-bde9-1886331527ea" message="#['Accounts to sync: ' ++ write(payload)]" />
     <flow-ref name="businessLogicFlow" doc:name="businessLogicFlow" doc:id="e16bf02c-b833-47de-afd5-2329ce1fab2b" />
     <error-handler >
         <on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="488b507d-e26c-4c56-8759-8bb4f6645d71" type="ANY">
@@ -41,7 +40,6 @@ http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mu
 		<os:store key="watermark" failIfPresent="false" failOnNullValue="false" objectStore="watermarkStore" doc:name="Store lastQueryTimestamp">
         <os:value ><![CDATA[#[if(sizeOf(payload)==0) vars.lastQueryTimestamp as String else (max(payload map $.LastModifiedDate) as String)]]]></os:value>
     </os:store>
-		<logger level="INFO" doc:name="Logger" doc:id="8526a5ff-342b-4963-b139-2a50f22b95ce" message="new watermark value=#[if(sizeOf(payload)==0) vars.lastQueryTimestamp as String else (max(payload map $.LastModifiedDate) as String)]"/>
 
 </flow>
 </mule>

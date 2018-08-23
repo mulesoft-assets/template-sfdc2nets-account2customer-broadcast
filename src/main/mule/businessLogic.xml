@@ -1,25 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+<mule xmlns:netsuite="http://www.mulesoft.org/schema/mule/netsuite"
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
       xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
       xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
       xmlns="http://www.mulesoft.org/schema/mule/core"
-      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
-http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/netsuite http://www.mulesoft.org/schema/mule/netsuite/current/mule-netsuite.xsd">
 
 <flow name="businessLogicFlow" doc:id="8759532e-79b7-4789-990c-dc8e162bfd67" >
     <batch:job jobName="migrateAccountsBatch" doc:id="204892ae-0d97-4326-beae-310c8d52b7a6">
         <batch:process-records>
-            <batch:step name="foreachAccountInSalesforceGetAccountInNetsuiteStep" doc:id="89713774-362a-4e92-9bdc-41e31802bf38">
-                <logger level="INFO" doc:name="Query Account in Netsuite" doc:id="3bde4c45-1ce4-4d5f-96f1-d3494609319c" />
-            </batch:step>
-            <batch:step name="foreachAccountInSalesforceUpsertAccountInNetsuiteStep" doc:id="78a74ab4-9b91-416d-985a-acda2ac377eb">
-                <batch:aggregator doc:name="Batch Aggregator" doc:id="1ad86a98-643e-494a-a90a-32daab0b03cc" size="${page.size}">
-                    <logger level="INFO" doc:name="Upsert Accounts in Netsuite" doc:id="7236a9f6-7aaf-4f40-94e3-e477a132e88d" />
-                </batch:aggregator>
+            <batch:step name="foreachAccountInSalesforceUpsertCustomerInNetsuiteStep" doc:id="89713774-362a-4e92-9bdc-41e31802bf38">
+					<ee:transform doc:name="Transform Message" doc:id="5e7328f2-46d2-4149-8811-fe8cf87ea693" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	fax : payload.Fax,
+	phone : payload.Phone,
+	companyName : payload.Name,
+	externalId : payload.Id,
+	url : payload.Website,
+	subsidiary: {
+		"type": "SUBSIDIARY",
+		internalId: p("nets.customer.subsidiary.internalId")
+	} as Object {class: "org.mule.module.netsuite.extension.api.RecordRef"}
+}]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+					<netsuite:upsert-record recordType="CUSTOMER" doc:name="Upsert record" doc:id="51449a22-41e2-42d0-a263-a12760b387da" config-ref="NetSuite_Config" />
             </batch:step>
         </batch:process-records>
         <batch:on-complete>
