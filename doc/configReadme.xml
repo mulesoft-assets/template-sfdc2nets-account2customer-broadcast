@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<configuration>
+	<placeholders>
+		<placeholder id="template_name">Salesforce to Netsuite Account to Customer Broadcast</placeholder>
+	</placeholders>
+	<sections>
+		<section id="use_case">
+
+This Anypoint Template should serve as a foundation for setting an online sync of Accounts from Salesforce instance to Customers in Netsuite instance. Every time there is a new Account or a change in an already existing one, the integration will poll for changes in Salesforce source instance and it will be responsible for creating or updating the Customer in Netsuite target instance.
+
+Requirements have been set not only to be used as examples, but also to establish a starting point to adapt your integration to your requirements.
+
+As implemented, this Anypoint Template leverage the [Batch Module](http://www.mulesoft.org/documentation/display/current/Batch+Processing).
+The batch job is divided in Input, Process and On Complete stages.
+The integration is triggered by a scheduler defined in the flow that is going to trigger the application, querying newest Salesforce updates/creations matching a filter criteria and executing the batch job.
+Then the data are adapted for creating/updating the Customer in Netsuite and call the upsert operation in Netsuite system.
+Finally, during the On Complete stage the Anypoint Template will log output statistics data into the console.
+		</section>
+		<section id="considerations">
+<![CDATA[
+To make this Anypoint Template run, there are certain preconditions that must be considered. All of them deal with the preparations in both source and destination systems, that must be made in order for all to run smoothly. **Failing to do so could lead to unexpected behavior of the template.**
+]]>
+		</section>
+		<section id="nets_dst">
+<![CDATA[
+Customer must be assigned to subsidiary. In this template, this is done statically and you must configure the property file with subsidiary *internalId* that is already in the system. You can find out this number by entering 'subsidiaries' 
+into the NetSuite search field and selecting 'Page - Subsidiaries'. When you click on the 'View' next to the subsidiary chosen, you will see the ID in the URL line. Please, use this Id to populate *nets.subsidiaryId* property in the property file.
+]]>
+		</section>
+		<section id="run_it">
+<![CDATA[
+See below.
+]]>
+		</section>
+		<section id="default_running_on_premise">
+<![CDATA[
+In this section we detail the way you have to run you Anypoint Temple on you computer.
+
+Once your app is all set and started, there is no need to do anything else. The application will poll Accounts in Salesforce to know if there are any newly created or updated objects and synchronice them.
+]]>
+		</section>
+		<section id="default_running_on_cloudhub">
+<![CDATA[
+While [creating your application on CloudHub](http://www.mulesoft.org/documentation/display/current/Hello+World+on+CloudHub) (Or you can do it later as a next step), you need to go to Deployment > Advanced to set all environment variables detailed in **Properties to be configured** as well as the **mule.env**. 
+
+Once your app is all set and started, there is no need to do anything else. Every time an account is created or modified, it will be automatically synchronised to Salesforce Org B as long as it has an Email.
+]]>
+		</section>
+		<section id="application_configuration">
+		<![CDATA[
+**Application configuration**
+
++ scheduler.frequency `20000`
++ scheduler.start.delay `1000`
++ watermark.default.expression `2017-12-31T00:00:00.00Z`
+
+**Salesforce Connector configuration**
+
++ sfdc.username `bob.dylan@orga`
++ sfdc.password `DylanPassword123`
++ sfdc.securityToken `avsfwCUl7apQs56Xq2AKi3X`
+
+**Netsuite Connector configuration**
+
++ nets.email `example@organization.com`
++ nets.password `Passowrd123`
++ nets.account `NetsuiteAccount`
++ nets.roleId `3`
++ nets.applicationId `77EBCBD6-AF9F-11E5-BF7F-FEFF819CDC9F`
++ nets.customer.subsidiary.internalId `1`
+
+**Note**: the property `nets.customer.subsidiary.internalId` set **subsidiary** for every new Customer in Netsuite instance.
+]]>
+		</section>
+		<section id="api_calls">
+		<![CDATA[
+Salesforce imposes limits on the number of API Calls that can be made. However, in this template, only one call per scheduler cycle is done to retrieve all the information required.
+]]>
+		</section>
+		<section id="businessLogic.xml">
+		<![CDATA[
+Functional aspect of the Anypoint Template is implemented on this XML, directed by one flow that will poll for Salesforce creations/updates. The several message processors constitute four high level actions that fully implement the logic of this Anypoint Template:
+
+1. During the Input stage the Anypoint Template will go to the Salesforce instance and query all the existing Accounts that match the filter criteria.
+2. During the Process stage, for each Account from Salesforce instance the data are adapted for creating/updating the Customer in Netsuite and call the upsert operation in Netsuite system.
+3. Finally during the On Complete stage the Anypoint Template will log output statistics data into the console.
+]]>
+		</section>
+		<section id="endpoints.xml">
+		<![CDATA[
+This is file contains the Scheduler endpoint that will periodically query Salesforce for updated/created Accounts that meet the defined criteria in the query, and then executing the batch job process, where the data serve as input.
+]]>
+		</section>
+	</sections>
+</configuration>
