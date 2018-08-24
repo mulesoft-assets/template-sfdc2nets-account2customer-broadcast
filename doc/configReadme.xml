@@ -12,14 +12,13 @@ Requirements have been set not only to be used as examples, but also to establis
 
 As implemented, this Anypoint Template leverage the [Batch Module](http://www.mulesoft.org/documentation/display/current/Batch+Processing).
 The batch job is divided in Input, Process and On Complete stages.
-The integration is triggered by a poll defined in the flow that is going to trigger the application, querying newest Salesforce updates/creations matching a filter criteria and executing the batch job.
-During the Process stage, for each Account from Salesforce instance, we try to find already created Customer in Netsuite instance according to Account's name.
+The integration is triggered by a scheduler defined in the flow that is going to trigger the application, querying newest Salesforce updates/creations matching a filter criteria and executing the batch job.
 Then the data are adapted for creating/updating the Customer in Netsuite and call the upsert operation in Netsuite system.
 Finally, during the On Complete stage the Anypoint Template will log output statistics data into the console.
 		</section>
 		<section id="considerations">
 <![CDATA[
-To make this Anypoint Template run, there are certain preconditions that must be considered. All of them deal with the preparations in both source and destination systems, that must be made in order for all to run smoothly. **Failling to do so could lead to unexpected behavior of the template.**
+To make this Anypoint Template run, there are certain preconditions that must be considered. All of them deal with the preparations in both source and destination systems, that must be made in order for all to run smoothly. **Failing to do so could lead to unexpected behavior of the template.**
 ]]>
 		</section>
 		<section id="nets_dst">
@@ -51,17 +50,15 @@ Once your app is all set and started, there is no need to do anything else. Ever
 		<![CDATA[
 **Application configuration**
 
-+ page.size `200`
-+ polling.frequency `20000`
-+ polling.startDelay `1000`
-+ watermark.default.expression `2015-12-31T10:00:00.000Z`
++ scheduler.frequency `20000`
++ scheduler.start.delay `1000`
++ watermark.default.expression `2017-12-31T00:00:00.00Z`
 
 **Salesforce Connector configuration**
 
 + sfdc.username `bob.dylan@orga`
 + sfdc.password `DylanPassword123`
 + sfdc.securityToken `avsfwCUl7apQs56Xq2AKi3X`
-+ sfdc.url `https://login.salesforce.com/services/Soap/u/32.0`
 
 **Netsuite Connector configuration**
 
@@ -77,10 +74,10 @@ Once your app is all set and started, there is no need to do anything else. Ever
 		</section>
 		<section id="api_calls">
 		<![CDATA[
-Salesforce imposes limits on the number of API Calls that can be made. However, in this template, only one call per poll cycle is done to retrieve all the information required.
+Salesforce imposes limits on the number of API Calls that can be made. However, in this template, only one call per scheduler cycle is done to retrieve all the information required.
 ]]>
 		</section>
-		<section id="default_business_logic_xml">
+		<section id="businessLogic.xml">
 		<![CDATA[
 Functional aspect of the Anypoint Template is implemented on this XML, directed by one flow that will poll for Salesforce creations/updates. The several message processors constitute four high level actions that fully implement the logic of this Anypoint Template:
 
@@ -89,9 +86,9 @@ Functional aspect of the Anypoint Template is implemented on this XML, directed 
 3. Finally during the On Complete stage the Anypoint Template will log output statistics data into the console.
 ]]>
 		</section>
-		<section id="default_endpoints_xml">
+		<section id="endpoints.xml">
 		<![CDATA[
-This is file contains the Poll endpoint that will periodically query Salesforce for updated/created Accounts that meet the defined criteria in the query, and then executing the batch job process, where the data serve as input.
+This is file contains the Scheduler endpoint that will periodically query Salesforce for updated/created Accounts that meet the defined criteria in the query, and then executing the batch job process, where the data serve as input.
 ]]>
 		</section>
 	</sections>
