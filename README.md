@@ -9,15 +9,15 @@
 This template is subject to the conditions of the <a href="https://s3.amazonaws.com/templates-examples/AnypointTemplateLicense.pdf">MuleSoft License Agreement</a>. Review the terms of the license before downloading and using this template. You can use this template for free with the Mule Enterprise Edition, CloudHub, or as a trial in Anypoint Studio. 
 # Use Case
 <!-- Use Case (start) -->
-This Anypoint Template should serve as a foundation for setting an online sync of Accounts from Salesforce instance to Customers in Netsuite instance. Every time there is a new Account or a change in an already existing one, the integration will poll for changes in Salesforce source instance and it will be responsible for creating or updating the Customer in Netsuite target instance.
+This Anypoint template serves as a foundation for setting an online sync of Accounts from Salesforce instance to Customers in Netsuite instance. Every time there is a new Account or a change in an already existing one, the integration will poll for changes in Salesforce source instance and it will be responsible for creating or updating the Customer in Netsuite target instance.
 
 Requirements have been set not only to be used as examples, but also to establish a starting point to adapt your integration to your requirements.
 
-As implemented, this Anypoint Template leverage the [Batch Module](http://www.mulesoft.org/documentation/display/current/Batch+Processing).
+As implemented, this template leverage the Mule batch module.
 The batch job is divided in Input, Process and On Complete stages.
 The integration is triggered by a scheduler defined in the flow that is going to trigger the application, querying newest Salesforce updates/creations matching a filter criteria and executing the batch job.
 Then the data are adapted for creating/updating the Customer in Netsuite and call the upsert operation in Netsuite system.
-Finally, during the On Complete stage the Anypoint Template will log output statistics data into the console.
+Finally, during the On Complete stage the template logs output statistics data into the console.
 <!-- Use Case (end) -->
 
 # Considerations
@@ -26,7 +26,7 @@ Finally, during the On Complete stage the Anypoint Template will log output stat
 <!-- Default Considerations (end) -->
 
 <!-- Considerations (start) -->
-To make this Anypoint Template run, there are certain preconditions that must be considered. All of them deal with the preparations in both source and destination systems, that must be made in order for all to run smoothly. **Failing to do so could lead to unexpected behavior of the template.**
+To make this template run, there are certain preconditions that must be considered. All of them deal with the preparations in both source and destination systems, that must be made for the template to run smoothly. **Failing to do so could lead to unexpected behavior of the template.**
 <!-- Considerations (end) -->
 
 
@@ -142,19 +142,19 @@ In Studio, right click your project name in Package Explorer and select Anypoint
 To use this template, configure properties such as credentials, configurations, etc.) in the properties file or in CloudHub from Runtime Manager > Manage Application > Properties. The sections that follow list example values.
 ### Application Configuration
 <!-- Application Configuration (start) -->
-**Application configuration**
+**Application Configuration**
 
 + scheduler.frequency `20000`
 + scheduler.start.delay `1000`
 + watermark.default.expression `2017-12-31T00:00:00.00Z`
 
-**Salesforce Connector configuration**
+**Salesforce Connector Configuration**
 
 + sfdc.username `bob.dylan@orga`
 + sfdc.password `DylanPassword123`
 + sfdc.securityToken `avsfwCUl7apQs56Xq2AKi3X`
 
-**Netsuite Connector configuration**
+**Netsuite Connector Configuration**
 
 + nets.email `example@organization.com`
 + nets.password `Passowrd123`
