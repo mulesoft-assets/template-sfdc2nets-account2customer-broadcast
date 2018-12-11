@@ -2,22 +2,26 @@
 # Anypoint Template: Salesforce to Netsuite Account to Customer Broadcast	
 
 <!-- Header (start) -->
+Broadcasts new customer accountsor updates to existing accounts in Salesforce to NetSuite in real time. This template can be used to ensure that the customer account information in NetSuite remains updated to the changes in Salesforce. 
 
+The detection criteria and fields to integrate are configurable. Additional systems can be added to be notified of the changes. Real time synchronization is achieved either via rapid polling of Salesforce or Outbound Notifications to reduce the number of API calls. 
+
+This template uses batch processing and watermarking capabilities within the Anypoint Platform to efficiently process many records.
+
+![b2b4af6b-288a-4288-b34a-5c099f567a16-image.png](https://exchange2-file-upload-service-kprod.s3.us-east-1.amazonaws.com:443/b2b4af6b-288a-4288-b34a-5c099f567a16-image.png)
 <!-- Header (end) -->
 
 # License Agreement
 This template is subject to the conditions of the <a href="https://s3.amazonaws.com/templates-examples/AnypointTemplateLicense.pdf">MuleSoft License Agreement</a>. Review the terms of the license before downloading and using this template. You can use this template for free with the Mule Enterprise Edition, CloudHub, or as a trial in Anypoint Studio. 
 # Use Case
 <!-- Use Case (start) -->
-This Anypoint template serves as a foundation for setting an online sync of Accounts from Salesforce instance to Customers in Netsuite instance. Every time there is a new Account or a change in an already existing one, the integration will poll for changes in Salesforce source instance and it will be responsible for creating or updating the Customer in Netsuite target instance.
+This template performs an online sync of accounts from a Salesforce instance to customers in a NetSuite instance. Each time an account is added or an existing account changed, the integration polls for changes in the Salesforce source instance and creates or updates the customer in the NetSuite target instance.
 
 Requirements have been set not only to be used as examples, but also to establish a starting point to adapt your integration to your requirements.
 
-As implemented, this template leverage the Mule batch module.
-The batch job is divided in Input, Process and On Complete stages.
-The integration is triggered by a scheduler defined in the flow that is going to trigger the application, querying newest Salesforce updates/creations matching a filter criteria and executing the batch job.
-Then the data are adapted for creating/updating the Customer in Netsuite and call the upsert operation in Netsuite system.
-Finally, during the On Complete stage the template logs output statistics data into the console.
+This template leverage the Mule batch module.
+The batch job is divided in Input, Process, and On Complete stages.
+A scheduler in the flow triggers the application, queries Salesforce for updates or creates that match a filter, and executes the batch job. Data is then adapted to create or update the customer in NetSuite and call the upsert operation in the NetSuite system. Finally, during the On Complete stage the template logs output statistics data to the console.
 <!-- Use Case (end) -->
 
 # Considerations
@@ -26,14 +30,14 @@ Finally, during the On Complete stage the template logs output statistics data i
 <!-- Default Considerations (end) -->
 
 <!-- Considerations (start) -->
-To make this template run, there are certain preconditions that must be considered. All of them deal with the preparations in both source and destination systems, that must be made for the template to run smoothly. **Failing to do so could lead to unexpected behavior of the template.**
+To make this template run, there are certain preconditions that must be considered. All of them deal with the preparations in both source and destination systems, that must be made for the template to run smoothly. Failing to do so can lead to unexpected behavior of the template.
 <!-- Considerations (end) -->
 
 
 
 ## Salesforce Considerations
 
-Here's what you need to know about Salesforce to get this template to work:
+To get this template to work:
 
 - Where can I check that the field configuration for my Salesforce instance is the right one? See: <a href="https://help.salesforce.com/HTViewHelpDoc?id=checking_field_accessibility_for_a_particular_field.htm&language=en_US">Salesforce: Checking Field Accessibility for a Particular Field</a>.
 - Can I modify the Field Access Settings? How? See: <a href="https://help.salesforce.com/HTViewHelpDoc?id=modifying_field_access_settings.htm&language=en_US">Salesforce: Modifying Field Access Settings</a>.
@@ -49,9 +53,10 @@ exceptionMessage='Account.Phone, Account.Rating, Account.RecordTypeId,
 Account.ShippingCity
 ^
 ERROR at Row:1:Column:486
-No such column 'RecordTypeId' on entity 'Account'. If you are attempting to 
-use a custom field, be sure to append the '__c' after the custom field name. 
-Reference your WSDL or the describe call for the appropriate names.'
+No such column 'RecordTypeId' on entity 'Account'. If you are 
+attempting to use a custom field, be sure to append the '__c' 
+after the custom field name. Reference your WSDL or the describe 
+call for the appropriate names.'
 ]
 row='1'
 column='486'
@@ -59,21 +64,13 @@ column='486'
 ]
 ```
 
-
-
-
-
-
 ## NetSuite Considerations
 
 
 ### As a Data Destination
 
-Customer must be assigned to subsidiary. In this template, this is done statically and you must configure the property file with subsidiary *internalId* that is already in the system. You can find out this number by entering 'subsidiaries' 
-into the NetSuite search field and selecting 'Page - Subsidiaries'. When you click on the 'View' next to the subsidiary chosen, you will see the ID in the URL line. Please, use this Id to populate *nets.subsidiaryId* property in the property file.
-
-
-
+Customer must be assigned to a subsidiary. In this template, this is done statically and you must configure the property file with subsidiary *internalId* that is already in the system. You can find this number by entering `subsidiaries` 
+in the NetSuite search field and selecting 'Page - Subsidiaries'. When you click **View** next to a subsidiary, you see the ID in the URL line. Use this ID to populate the *nets.subsidiaryId* property in the property file.
 
 # Run it!
 Simple steps to get this template running.
@@ -84,7 +81,7 @@ See below.
 ## Running On Premises
 In this section we detail the way you have to run you Anypoint Temple on you computer.
 
-Once your app is all set and started, there is no need to do anything else. The application will poll Accounts in Salesforce to know if there are any newly created or updated objects and synchronice them.
+After starting your app, there is no need to do anything else. The application polls accounts in Salesforce for newly created or updated objects, and synchronizes them.
 <!-- Running on premise (start) -->
 
 <!-- Running on premise (end) -->
@@ -109,13 +106,13 @@ In Studio, click the Exchange X icon in the upper left of the taskbar, log in wi
 ### Running on Studio
 After you import your template into Anypoint Studio, follow these steps to run it:
 
-+ Locate the properties file `mule.dev.properties`, in src/main/resources.
-+ Complete all the properties required as per the examples in the "Properties to Configure" section.
-+ Right click the template project folder.
-+ Hover your mouse over `Run as`.
-+ Click `Mule Application (configure)`.
-+ Inside the dialog, select Environment and set the variable `mule.env` to the value `dev`.
-+ Click `Run`.
+1. Locate the properties file `mule.dev.properties`, in src/main/resources.
+2. Complete all the properties required as per the examples in the "Properties to Configure" section.
+3. Right click the template project folder.
+4. Hover your mouse over `Run as`.
+5. Click `Mule Application (configure)`.
+6. Inside the dialog, select Environment and set the variable `mule.env` to the value `dev`.
+7. Click `Run`.
 <!-- Running on Studio (start) -->
 
 <!-- Running on Studio (end) -->
@@ -123,11 +120,11 @@ After you import your template into Anypoint Studio, follow these steps to run i
 ### Running on Mule Standalone
 Update the properties in one of the property files, for example in mule.prod.properties, and run your app with a corresponding environment variable. In this example, use `mule.env=prod`. 
 
-
 ## Running on CloudHub
-While [creating your application on CloudHub](http://www.mulesoft.org/documentation/display/current/Hello+World+on+CloudHub) (Or you can do it later as a next step), you need to go to Deployment > Advanced to set all environment variables detailed in **Properties to be configured** as well as the **mule.env**. 
+While creating your application on CloudHub (or you can do it later as a next step), you need to go to Deployment > Advanced to set all environment variables detailed in **Properties to Configure** as well as setting the **mule.env** file. 
 
-Once your app is all set and started, there is no need to do anything else. Every time an account is created or modified, it will be automatically synchronised to Salesforce Org B as long as it has an Email.
+After starting your app, there is no need to do anything else. The application polls accounts in Salesforce for newly created or updated objects, and synchronizes to NetSuite as long as it has an Email.
+
 <!-- Running on Cloudhub (start) -->
 
 <!-- Running on Cloudhub (end) -->
@@ -163,7 +160,7 @@ To use this template, configure properties such as credentials, configurations, 
 + nets.applicationId `77EBCBD6-AF9F-11E5-BF7F-FEFF819CDC9F`
 + nets.customer.subsidiary.internalId `1`
 
-**Note**: the property `nets.customer.subsidiary.internalId` set **subsidiary** for every new Customer in Netsuite instance.
+**Note**: The property `nets.customer.subsidiary.internalId` set **subsidiary** for every new customer in the NetSuite instance.
 <!-- Application Configuration (end) -->
 
 # API Calls
@@ -183,7 +180,8 @@ This brief guide provides a high level understanding of how this template is bui
 
 ## config.xml
 <!-- Default Config XML (start) -->
-This file provides the configuration for connectors and configuration properties. Only change this file to make core changes to the connector processing logic. Otherwise, all parameters that can be modified should instead be in a properties file, which is the recommended place to make changes.<!-- Default Config XML (end) -->
+This file provides the configuration for connectors and configuration properties. Only change this file to make core changes to the connector processing logic. Otherwise, all parameters that can be modified should instead be in a properties file, which is the recommended place to make changes.
+<!-- Default Config XML (end) -->
 
 <!-- Config XML (start) -->
 
@@ -191,7 +189,8 @@ This file provides the configuration for connectors and configuration properties
 
 ## businessLogic.xml
 <!-- Default Business Logic XML (start) -->
-The business logic XML file creates or updates objects in the destination system for a represented use case. You can customize and extend the logic of this template in this XML file to more meet your needs.<!-- Default Business Logic XML (end) -->
+The business logic XML file creates or updates objects in the destination system for a represented use case. You can customize and extend the logic of this template in this XML file to more meet your needs.
+<!-- Default Business Logic XML (end) -->
 
 <!-- Business Logic XML (start) -->
 
@@ -199,7 +198,8 @@ The business logic XML file creates or updates objects in the destination system
 
 ## endpoints.xml
 <!-- Default Endpoints XML (start) -->
-This file contains the endpoints for triggering the template and for retrieving the objects that meet the defined criteria in a query. You can execute a batch job process with the query results.<!-- Default Endpoints XML (end) -->
+This file contains the endpoints for triggering the template and for retrieving the objects that meet the defined criteria in a query. You can execute a batch job process with the query results.
+<!-- Default Endpoints XML (end) -->
 
 <!-- Endpoints XML (start) -->
 
@@ -207,7 +207,8 @@ This file contains the endpoints for triggering the template and for retrieving 
 
 ## errorHandling.xml
 <!-- Default Error Handling XML (start) -->
-This file handles how your integration reacts depending on the different exceptions. This file provides error handling that is referenced by the main flow in the business logic.<!-- Default Error Handling XML (end) -->
+This file handles how your integration reacts depending on the different exceptions. This file provides error handling that is referenced by the main flow in the business logic.
+<!-- Default Error Handling XML (end) -->
 
 <!-- Error Handling XML (start) -->
 
