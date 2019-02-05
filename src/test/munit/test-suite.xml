@@ -27,7 +27,7 @@ http://www.mulesoft.org/schema/mule/netsuite http://www.mulesoft.org/schema/mule
 			<scripting:execute engine="groovy" doc:name="Sleep for 1m until the processing is completed" doc:id="ba10207c-687c-45f6-b940-1fd3dd0e7f01" >
 				<scripting:code >sleep(60000)</scripting:code>
 			</scripting:execute>
-			<ee:transform doc:name="Query for migrated NetSuite customer" doc:id="a2f98201-8b5a-464c-ad92-684861d728e9" >
+			<ee:transform doc:name="Query for migrated customer in NetSuite" doc:id="a2f98201-8b5a-464c-ad92-684861d728e9" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/java
@@ -53,7 +53,7 @@ output application/java
 	</munit:test>
 
 	<munit:after-test name="test-suiteAfter_Test" description="After tests actions" doc:id="d2758c2d-64fc-4432-8112-5634cdd9f481" >
-		<ee:transform doc:name="Mapping for deleting migrated Customer for NetSuite" doc:id="a0fea0cd-6bea-4af3-84c6-8fcac57f1a33">
+		<ee:transform doc:name="Prepare query for deleting migrated Customer in NetSuite" doc:id="a0fea0cd-6bea-4af3-84c6-8fcac57f1a33">
 			<ee:message>
 				<ee:set-payload><![CDATA[%dw 2.0
 output application/java
