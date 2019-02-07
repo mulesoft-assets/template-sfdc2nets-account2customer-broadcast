@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:netsuite="http://www.mulesoft.org/schema/mule/netsuite"
+	xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd 
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+http://www.mulesoft.org/schema/mule/netsuite http://www.mulesoft.org/schema/mule/netsuite/current/mule-netsuite.xsd">
+	<munit:config name="test-suite.xml" />
+	<configuration-properties doc:name="Configuration properties" doc:id="079b3825-39cd-4d28-abfb-58b86c70eaba" file="mule.test.properties" />
+	<munit:before-suite name="test-suiteBefore_Suite"
+		description="Before suite actions" doc:id="20ffcc8b-8232-41ed-87bb-93b333b79636">
+		<munit-tools:mock-when doc:name="Mock email processor to avoid sending email"
+			doc:id="7807421c-70aa-491b-9892-321fa634081c" processor="email:send" />
+	</munit:before-suite>
+	<munit:test name="test-suite-businessLogicFlowTest"
+		description="Test" doc:id="5bda7a72-5e09-4d0f-8bce-e0ad8e12b204">
+		<munit:execution>
+			<flow-ref doc:name="Flow-ref to prepareDynamicDataInput" doc:id="ea410634-efd2-41a0-b054-ec479b2067a2" name="prepareDynamicDataInput"/>
+			<flow-ref doc:name="Flow-ref to businessLogicFlow" doc:id="540a9922-5f34-465f-befa-2888f56b1a81"
+				name="businessLogicFlow" />
+			<scripting:execute engine="groovy" doc:name="Sleep for 1m until the processing is completed" doc:id="ba10207c-687c-45f6-b940-1fd3dd0e7f01" >
+				<scripting:code >sleep(60000)</scripting:code>
+			</scripting:execute>
+			<ee:transform doc:name="Query for migrated customer in NetSuite" doc:id="a2f98201-8b5a-464c-ad92-684861d728e9" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	basic: {
+		companyName: {
+			operator: "IS",
+			searchValue: vars.AccountVar.Account.Name
+		}
+	}
+} as Object {class: "org.mule.module.netsuite.extension.api.CustomerSearch"}
+]]></ee:set-payload>
+			</ee:message>
+			</ee:transform>
+			<netsuite:search key="CUSTOMER" pageSize="100" doc:name="Search migrated customer" doc:id="179d53fb-5c9e-4037-b213-f545e829a3d0" config-ref="NetSuite_Config" target="migratedCustomerNetSuite" targetValue="#[payload[0]]"/>
+
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that the name in response is equal" doc:id="706d5287-b5fd-4889-8f96-2dbb016d84bd" is="#[MunitTools::equalTo(vars.AccountVar.Account.Name)]" expression="#[vars.migratedCustomerNetSuite.companyName]"/>
+			<munit-tools:assert-that doc:name="Assert that the website in response is equal" doc:id="4bb1ee1d-259d-4294-b9da-d54d92727f13" is="#[MunitTools::equalTo(vars.AccountVar.Account.Website)]" expression="#[vars.migratedCustomerNetSuite.url]"/>
+		</munit:validation>
+	</munit:test>
+
+	<munit:after-test name="test-suiteAfter_Test" description="After tests actions" doc:id="d2758c2d-64fc-4432-8112-5634cdd9f481" >
+		<ee:transform doc:name="Prepare query for deleting migrated Customer in NetSuite" doc:id="a0fea0cd-6bea-4af3-84c6-8fcac57f1a33">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+{
+	internalId: vars.migratedCustomerNetSuite.internalId,
+	"type": "CUSTOMER"
+} as Object {
+	class : "org.mule.module.netsuite.extension.api.RecordRef"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<netsuite:delete-record doc:name="Delete migrated Customer in NetSuite" doc:id="923535d8-efc5-44a1-82f3-4d3b35fcb479" config-ref="NetSuite_Config">
+		</netsuite:delete-record>
+	</munit:after-test>
+	<sub-flow name="prepareDynamicDataInput" doc:id="f63ac6d0-0371-46c8-8547-ae9e79e6106d">
+		<ee:transform
+			doc:name="Prepare dynamic testing variable - also used for assertions"
+			doc:id="dc920436-83ec-47ce-b148-99250bebf89c">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="AccountVar"><![CDATA[%dw 2.0
+output application/java
+---
+Account : {
+	Id: '0010J00001zJT99QAG',
+	Website: 'http://acme' ++ randomInt(1000) ++ 'dl.org',
+	Name: "Test_AccToInsert_account-migration_" ++ uuid()
+}
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="Prepare test payload"
+			doc:id="2d6bd92a-2cc6-448d-a7b5-856cafc41761">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+[{
+	Id : vars.AccountVar.Account.Id,
+	Industry: 'Biology',
+	Name: vars.AccountVar.Account.Name,
+	Website: vars.AccountVar.Account.Website,
+	Phone : '1000047524',
+	fax : vars.AccountVar.Account.fax,
+	companyName : vars.AccountVar.Account.companyName
+}]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+
+	</sub-flow>
+</mule>
