@@ -47,8 +47,8 @@ output application/java
 
 		</munit:execution>
 		<munit:validation >
-			<munit-tools:assert-that doc:name="Assert that" doc:id="706d5287-b5fd-4889-8f96-2dbb016d84bd" is="#[MunitTools::equalTo(vars.AccountVar.Account.Name)]" expression="#[vars.migratedCustomerNetSuite.companyName]"/>
-			<munit-tools:assert-that doc:name="Assert that" doc:id="4bb1ee1d-259d-4294-b9da-d54d92727f13" is="#[MunitTools::equalTo(vars.AccountVar.Account.Website)]" expression="#[vars.migratedCustomerNetSuite.url]"/>
+			<munit-tools:assert-that doc:name="Assert that the name in response is equal" doc:id="706d5287-b5fd-4889-8f96-2dbb016d84bd" is="#[MunitTools::equalTo(vars.AccountVar.Account.Name)]" expression="#[vars.migratedCustomerNetSuite.companyName]"/>
+			<munit-tools:assert-that doc:name="Assert that the website in response is equal" doc:id="4bb1ee1d-259d-4294-b9da-d54d92727f13" is="#[MunitTools::equalTo(vars.AccountVar.Account.Website)]" expression="#[vars.migratedCustomerNetSuite.url]"/>
 		</munit:validation>
 	</munit:test>
 
