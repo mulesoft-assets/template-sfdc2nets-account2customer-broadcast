@@ -1,10 +1,10 @@
 
-# Anypoint Template: Salesforce to Netsuite Account to Customer Broadcast	
+# Anypoint Template: Salesforce to Netsuite Account to Customer Broadcast
 
 <!-- Header (start) -->
-Broadcasts new customer accountsor updates to existing accounts in Salesforce to NetSuite in real time. This template can be used to ensure that the customer account information in NetSuite remains updated to the changes in Salesforce. 
+Broadcasts new customer accountsor updates to existing accounts in Salesforce to NetSuite in real time. This template can be used to ensure that the customer account information in NetSuite remains updated to the changes in Salesforce.
 
-The detection criteria and fields to integrate are configurable. Additional systems can be added to be notified of the changes. Real time synchronization is achieved either via rapid polling of Salesforce or Outbound Notifications to reduce the number of API calls. 
+The detection criteria and fields to integrate are configurable. Additional systems can be added to be notified of the changes. Real time synchronization is achieved either via rapid polling of Salesforce or Outbound Notifications to reduce the number of API calls.
 
 This template uses batch processing and watermarking capabilities within the Anypoint Platform to efficiently process many records.
 
@@ -12,7 +12,7 @@ This template uses batch processing and watermarking capabilities within the Any
 <!-- Header (end) -->
 
 # License Agreement
-This template is subject to the conditions of the <a href="https://s3.amazonaws.com/templates-examples/AnypointTemplateLicense.pdf">MuleSoft License Agreement</a>. Review the terms of the license before downloading and using this template. You can use this template for free with the Mule Enterprise Edition, CloudHub, or as a trial in Anypoint Studio. 
+This template is subject to the conditions of the <a href="https://s3.amazonaws.com/templates-examples/AnypointTemplateLicense.pdf">MuleSoft License Agreement</a>. Review the terms of the license before downloading and using this template. You can use this template for free with the Mule Enterprise Edition, CloudHub, or as a trial in Anypoint Studio.
 # Use Case
 <!-- Use Case (start) -->
 This template performs an online sync of accounts from a Salesforce instance to customers in a NetSuite instance. Each time an account is added or an existing account changed, the integration polls for changes in the Salesforce source instance and creates or updates the customer in the NetSuite target instance.
@@ -47,15 +47,15 @@ To get this template to work:
 If the user who configured the template for the source system does not have at least *read only* permissions for the fields that are fetched, then an *InvalidFieldFault* API fault displays.
 
 ```
-java.lang.RuntimeException: [InvalidFieldFault [ApiQueryFault 
+java.lang.RuntimeException: [InvalidFieldFault [ApiQueryFault
 [ApiFault  exceptionCode='INVALID_FIELD'
-exceptionMessage='Account.Phone, Account.Rating, Account.RecordTypeId, 
+exceptionMessage='Account.Phone, Account.Rating, Account.RecordTypeId,
 Account.ShippingCity
 ^
 ERROR at Row:1:Column:486
-No such column 'RecordTypeId' on entity 'Account'. If you are 
-attempting to use a custom field, be sure to append the '__c' 
-after the custom field name. Reference your WSDL or the describe 
+No such column 'RecordTypeId' on entity 'Account'. If you are
+attempting to use a custom field, be sure to append the '__c'
+after the custom field name. Reference your WSDL or the describe
 call for the appropriate names.'
 ]
 row='1'
@@ -69,7 +69,7 @@ column='486'
 
 ### As a Data Destination
 
-Customer must be assigned to a subsidiary. In this template, this is done statically and you must configure the property file with subsidiary *internalId* that is already in the system. You can find this number by entering `subsidiaries` 
+Customer must be assigned to a subsidiary. In this template, this is done statically and you must configure the property file with subsidiary *internalId* that is already in the system. You can find this number by entering `subsidiaries`
 in the NetSuite search field and selecting 'Page - Subsidiaries'. When you click **View** next to a subsidiary, you see the ID in the URL line. Use this ID to populate the *nets.subsidiaryId* property in the property file.
 
 # Run it!
@@ -118,10 +118,10 @@ After you import your template into Anypoint Studio, follow these steps to run i
 <!-- Running on Studio (end) -->
 
 ### Running on Mule Standalone
-Update the properties in one of the property files, for example in mule.prod.properties, and run your app with a corresponding environment variable. In this example, use `mule.env=prod`. 
+Update the properties in one of the property files, for example in mule.prod.properties, and run your app with a corresponding environment variable. In this example, use `mule.env=prod`.
 
 ## Running on CloudHub
-While creating your application on CloudHub (or you can do it later as a next step), you need to go to Deployment > Advanced to set all environment variables detailed in **Properties to Configure** as well as setting the **mule.env** file. 
+While creating your application on CloudHub (or you can do it later as a next step), you need to go to Deployment > Advanced to set all environment variables detailed in **Properties to Configure** as well as setting the **mule.env** file.
 
 After starting your app, there is no need to do anything else. The application polls accounts in Salesforce for newly created or updated objects, and synchronizes to NetSuite as long as it has an Email.
 
@@ -159,6 +159,8 @@ To use this template, configure properties such as credentials, configurations, 
 + nets.roleId `3`
 + nets.applicationId `77EBCBD6-AF9F-11E5-BF7F-FEFF819CDC9F`
 + nets.customer.subsidiary.internalId `1`
++ nets.connectionTimeout `30000`
++ nets.readTimeout `30000`
 
 **Note**: The property `nets.customer.subsidiary.internalId` set **subsidiary** for every new customer in the NetSuite instance.
 <!-- Application Configuration (end) -->
