@@ -27,7 +27,7 @@ http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mu
 </flow>
 <flow name="queryFlow">
     <os:retrieve key="watermark" objectStore="watermarkStore" target="lastQueryTimestamp" doc:name="Retrieve lastQueryTimestamp">
-        <os:default-value><![CDATA[${watermark.default.expression}]]></os:default-value>
+       <os:default-value ><![CDATA[#[read(p('watermark.default.expression'))]]]></os:default-value>
     </os:retrieve>
     <salesforce:query doc:name="Query Accounts from Salesforce" doc:id="c0d6a39e-cbc4-4053-84b5-e156f60091c4" config-ref="Salesforce_Config">
 			<salesforce:salesforce-query >SELECT AccountNumber, Fax, Id, LastModifiedDate, Name, Phone, Website FROM Account WHERE LastModifiedDate &gt; :lastQueryTimestamp ORDER BY LastModifiedDate ASC LIMIT 200</salesforce:salesforce-query>
